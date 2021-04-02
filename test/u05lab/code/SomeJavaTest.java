@@ -1,4 +1,4 @@
-package u05lab;
+package u05lab.code;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

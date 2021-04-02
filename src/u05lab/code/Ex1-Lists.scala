@@ -35,9 +35,13 @@ sealed trait List[A] {
 
   def span(pred: A => Boolean): (List[A],List[A])
 
-  def reduce(op: (A,A)=>A): A
+  def reduceLeft(op: (A,A)=>A): A
+
+  def reduceRight(op: (A,A)=>A): A
 
   def takeRight(n: Int): List[A]
+
+  def collect[B](f: PartialFunction[A,B]): List[B]
 
   // right-associative construction: 10 :: 20 :: 30 :: Nil()
   def ::(head: A): List[A] = Cons(head,this)
@@ -76,7 +80,7 @@ trait ListImplementation[A] extends List[A] {
     case _ => list
   }
   override def foreach(consumer: (A)=>Unit): Unit = this match {
-    case h :: t => {consumer(h); t foreach consumer}
+    case h :: t => consumer(h); t foreach consumer
     case _ => None
   }
   override def get(pos: Int): Option[A] = this match {
@@ -115,19 +119,68 @@ trait ListImplementation[A] extends List[A] {
     case Nil() => Nil()
   }
 
-  override def zipRight: List[(A,Int)] = ??? // questions: what is the type of keyword ???
+  override def zipRight: List[(A,Int)] = {
+//    @tailrec
+//    def _zipRight(l: List[A], k: Int = 0, res: List[(A,Int)] = List.nil): List[(A,Int)] = l match {
+//      case h :: t => _zipRight(t, k+1, (h,k) :: res)
+//      case _ => res
+//    }
+//    _zipRight(this).reverse()
 
-  override def partition(pred: A => Boolean): (List[A],List[A]) = ???
+//    var k=0
+//    this.map(e => { k+=1; (e,k) })
 
-  override def span(pred: A => Boolean): (List[A],List[A]) = ???
+    var i = -1; map((_, { i += 1; i }))
+  } // questions: what is the type of keyword ???
+
+  override def partition(pred: A => Boolean): (List[A],List[A]) = {
+//    @tailrec
+//    def _partitions(l: List[A], pred: A => Boolean, l1: List[A] = Nil(), l2: List[A] = Nil()): (List[A],List[A]) = l match {
+//      case h :: t if pred(h) => _partitions(t, pred, h :: l1, l2)
+//      case h :: t if !pred(h) => _partitions(t, pred, l1, h :: l2)
+//      case _ => (l1.reverse(),l2.reverse())
+//    }
+//    _partitions(this, pred)
+
+    (filter(pred), filter(!pred(_)))
+  }
+
+  override def span(pred: A => Boolean): (List[A],List[A]) = {
+    @tailrec
+    def _span(l: List[A], pred: A => Boolean, l1: List[A] = Nil()): (List[A],List[A]) = l match {
+      case h :: t => if (pred(h)) _span(t, pred, h :: l1) else (l1.reverse(), l)
+      case _ => (l1.reverse(), Nil())
+    }
+    _span(this, pred)
+  }
 
   /**
-    *
     * @throws UnsupportedOperationException if the list is empty
     */
-  override def reduce(op: (A,A)=>A): A = ???
+  override def reduceLeft(op: (A,A)=>A): A = {
+    this.reverse()reduceRight((a1,a2) => op(a2,a1))
+  }
 
-  override def takeRight(n: Int): List[A] = ???
+  /**
+    * @throws UnsupportedOperationException if the list is empty
+    */
+  override def reduceRight(op: (A,A)=>A): A = this match {
+    case h :: Nil() => h
+    case h :: t => op(h, t.reduceRight(op))
+    case _ => throw new UnsupportedOperationException
+  }
+
+  override def takeRight(n: Int): List[A] = {
+    @tailrec
+    def _takeRight(l: List[A], n: Int, l2: List[A] = Nil()): List[A] = l match {
+      case h :: t if n > 0 => _takeRight(t,n-1,h :: l2)
+      case _ :: _ if n == 0 => l2;
+      case _ => Nil()
+    }
+    _takeRight(this.reverse(), n)
+  }
+
+  override def collect[B](f: PartialFunction[A,B]): List[B] = filter(f.isDefinedAt).map(f)
 }
 
 // Factories
@@ -176,8 +229,8 @@ object ListsTest extends App {
   println(l.span(_<15)) // ( Cons(10,Nil()), Cons(20,Cons(30,Cons(40,Nil()))) )
 
   // Ex. 4: reduce
-  println(l.reduce(_+_)) // 100
-  try { List[Int]().reduce(_+_); assert(false) } catch { case _:UnsupportedOperationException => }
+  println(l.reduceLeft(_+_)) // 100
+  try { List[Int]().reduceLeft(_+_); assert(false) } catch { case _:UnsupportedOperationException => }
 
   // Ex. 5: takeRight
   println(l.takeRight(2)) // Cons(30,Cons(40,Nil()))
