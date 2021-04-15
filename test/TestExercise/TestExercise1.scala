@@ -1,9 +1,10 @@
-package u05lab.code
+package TestExercise
 
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions._
+import org.junit.jupiter.api.Test
+import u05lab.code.List
 
-class SomeTest {
+class TestExercise1 {
 
   @Test
   def testZipRight() {

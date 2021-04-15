@@ -15,6 +15,7 @@ object Kind {
     override def toString: String = "SUCCEEDED"
   }
 }
+
 trait ExamResult {
   def getKind: Kind
   def getEvaluation: Option[Int]
@@ -85,9 +86,10 @@ case class ExamResultFactoryImpl() extends ExamResultFactory {
 
 
 case class ExamsManagerImpl() extends ExamManager {
-  private var map: mutable.Map[String, Map[String, ExamResult]] = mutable.Map()
+  private val map: mutable.Map[String, Map[String, ExamResult]] = mutable.Map()
 
-  override def createNewCall(call: String): Unit = if (!map.contains(call)) map += (call -> Map.empty) else throw new IllegalArgumentException()
+  override def createNewCall(call: String): Unit =
+    if (!map.contains(call)) map += (call -> Map.empty) else throw new IllegalArgumentException()
 
   override def addStudentResult(call: String, student: String, result: ExamResult): Unit =
     if (!map(call).contains(student)) map(call) += (student -> result) else throw new IllegalArgumentException()

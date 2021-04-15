@@ -1,7 +1,8 @@
 package u05lab.code
 
 import java.util.concurrent.TimeUnit
-
+import scala.collection.{LinearSeq, mutable}
+import scala.collection.immutable.{HashMap, HashSet, ListSet}
 import scala.concurrent.duration.FiniteDuration
 
 object PerformanceUtils {
@@ -13,7 +14,7 @@ object PerformanceUtils {
     val startTime = System.nanoTime()
     val res = expr
     val duration = FiniteDuration(System.nanoTime()-startTime, TimeUnit.NANOSECONDS)
-    if(!msg.isEmpty) println(msg + " -- " + duration.toNanos + " nanos; " + duration.toMillis + "ms")
+    if(msg.nonEmpty) println(msg + " -- " + duration.toNanos + " nanos; " + duration.toMillis + "ms")
     MeasurementResults(res, duration)
   }
 
@@ -22,18 +23,19 @@ object PerformanceUtils {
 
 
 object CollectionsTest extends App {
-
-  /* Linear sequences: List, ListBuffer */
-
-  /* Indexed sequences: Vector, Array, ArrayBuffer */
-
-  /* Sets */
-
-  /* Maps */
-
-  /* Comparison */
   import PerformanceUtils._
   val lst = (1 to 1000000).toList
   val vec = (1 to 1000000).toVector
-  assert( measure("lst last"){ lst.last } > measure("vec last"){ vec.last } )
+  assert( measure("lst"){ lst.last } > measure("vec"){ vec.last } )
+  println
+
+  val iSeq = IndexedSeq(1 to 1000000)
+  val lSeq = LinearSeq(1 to 1000000)
+  assert( measure("iSeq"){ iSeq.foreach(_+"!") } > measure("lSeq"){ lSeq.foreach(_+"!") } )
+  println
+
+  val lSet = ListSet(1 to 1000000)
+  val hSet = HashSet(1 to 1000000)
+  assert( measure("lSet"){ lSet.foreach(_+"!") } > measure("hSet"){ hSet.foreach(_+"!") } )
+  println
 }
