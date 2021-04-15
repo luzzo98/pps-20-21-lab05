@@ -1,8 +1,9 @@
 package u05lab.code
 
-import u05lab.code.Kind.{Failed, Retired, Succeeded}
+import u05lab.code.Kind._
 import scala.collection._
 
+//Enum
 trait Kind
 object Kind {
   case class Retired() extends Kind {
@@ -30,7 +31,6 @@ trait ExamResult {
 }
 
 trait ExamResultFactory {
-
   def failed: ExamResult
   def retired: ExamResult
   def succeededCumLaude: ExamResult
@@ -39,7 +39,6 @@ trait ExamResultFactory {
 
 
 trait ExamManager {
-
   def createNewCall(call: String): Unit
 
   def addStudentResult(call: String, student: String, result: ExamResult): Unit
@@ -97,8 +96,8 @@ case class ExamsManagerImpl() extends ExamManager {
   override def getAllStudentsFromCall(call: String): Set[String] = map(call).keySet
 
   override def getEvaluationsMapFromCall(call: String): Map[String, Int] = {
-    var m: Map[String, Int] = Map()
-    map(call).foreach(k => if (k._2.getEvaluation.isDefined) m+=(k._1 -> k._2.getEvaluation.get))
+    var m = Map[String, Int]()
+    map(call).foreach(k => if (k._2.getEvaluation.isDefined) m += (k._1 -> k._2.getEvaluation.get))
     m
   }
 
@@ -110,10 +109,11 @@ case class ExamsManagerImpl() extends ExamManager {
 
   override def getBestResultFromStudent(student: String): Option[Int] = {
     var res = 0
-    map.foreach(k => k._2.foreach(x => if (x._1 == student)
-      if (x._2.getEvaluation.isDefined)
-        if (x._2.getEvaluation.get > res) res = x._2.getEvaluation.get
-    ))
+    map.foreach(k => k._2.foreach(x => {
+      if (x._1 == student)
+        if (x._2.getEvaluation.isDefined)
+          if (x._2.getEvaluation.get > res) res = x._2.getEvaluation.get
+    }))
     if (res==0) Option.empty else Option(res)
   }
 }
