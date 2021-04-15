@@ -11,5 +11,6 @@ class TestExercise4 {
   def testSequence(): Unit = {
     assertEquals(Some(List(1,2,3)), sequence(List[Option[Int]](Some(1), Some(2), Some(3))))
     assertEquals(None, sequence(List[Option[Int]](Some(1), None, Some(3))))
+    assertEquals(None, sequence(List[Option[Int]](None, Some(1), None, Some(3), None)))
   }
 }
