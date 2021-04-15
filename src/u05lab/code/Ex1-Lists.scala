@@ -120,6 +120,7 @@ trait ListImplementation[A] extends List[A] {
   }
 
   override def zipRight: List[(A,Int)] = {
+    // first version with tailrec
 //    @tailrec
 //    def _zipRight(l: List[A], k: Int = 0, res: List[(A,Int)] = List.nil): List[(A,Int)] = l match {
 //      case h :: t => _zipRight(t, k+1, (h,k) :: res)
@@ -127,13 +128,16 @@ trait ListImplementation[A] extends List[A] {
 //    }
 //    _zipRight(this).reverse()
 
+    // second verion with map
 //    var k=0
 //    this.map(e => { k+=1; (e,k) })
 
+    //another version with map
     var i = -1; map((_, { i += 1; i }))
-  } // questions: what is the type of keyword ???
+  }
 
   override def partition(pred: A => Boolean): (List[A],List[A]) = {
+    // first version with tailrec
 //    @tailrec
 //    def _partitions(l: List[A], pred: A => Boolean, l1: List[A] = Nil(), l2: List[A] = Nil()): (List[A],List[A]) = l match {
 //      case h :: t if pred(h) => _partitions(t, pred, h :: l1, l2)
@@ -142,6 +146,7 @@ trait ListImplementation[A] extends List[A] {
 //    }
 //    _partitions(this, pred)
 
+    // second version with filter
     (filter(pred), filter(!pred(_)))
   }
 
@@ -157,27 +162,33 @@ trait ListImplementation[A] extends List[A] {
   /**
     * @throws UnsupportedOperationException if the list is empty
     */
-  override def reduceLeft(op: (A,A)=>A): A = {
-    this.reverse()reduceRight((a1,a2) => op(a2,a1))
-  }
-
-  /**
-    * @throws UnsupportedOperationException if the list is empty
-    */
   override def reduceRight(op: (A,A)=>A): A = this match {
     case h :: Nil() => h
     case h :: t => op(h, t.reduceRight(op))
     case _ => throw new UnsupportedOperationException
   }
 
+  /**
+    * @throws UnsupportedOperationException if the list is empty
+    */
+  override def reduceLeft(op: (A,A)=>A): A = {
+    this.reverse()reduceRight((a1,a2) => op(a2,a1))
+  }
+
   override def takeRight(n: Int): List[A] = {
-    @tailrec
-    def _takeRight(l: List[A], n: Int, l2: List[A] = Nil()): List[A] = l match {
-      case h :: t if n > 0 => _takeRight(t,n-1,h :: l2)
-      case _ :: _ if n == 0 => l2;
-      case _ => Nil()
-    }
-    _takeRight(this.reverse(), n)
+    // first version with tailrec
+//    @tailrec
+//    def _takeRight(l: List[A], n: Int, l2: List[A] = Nil()): List[A] = l match {
+//      case h :: t if n > 0 => _takeRight(t, n-1, h :: l2)
+//      case _ :: _ if n == 0 => l2;
+//      case _ => Nil()
+//    }
+//    _takeRight(this.reverse(), n)
+
+    // second version with foreach
+    var i :Int = 0; var list :List[A] = Nil()
+    reverse().foreach(v => { i+=1; if (i <= n) list = v :: list })
+    list
   }
 
   override def collect[B](f: PartialFunction[A,B]): List[B] = filter(f.isDefinedAt).map(f)
