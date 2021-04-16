@@ -23,10 +23,14 @@ trait ExamResult {
   def cumLaude: Boolean
 
   override def toString: String = {
-    var s = ""
-    if (cumLaude) s="(30L)"
-    else if (getEvaluation.isDefined) s= "(" + getEvaluation.get.toString + ")"
-    getKind.toString + s
+    // first iterative version
+//    var s = ""
+//    if (cumLaude) s = "(30L)"
+//    else if (getEvaluation.isDefined) s= "(" + getEvaluation.get.toString + ")"
+//    getKind.toString + s
+
+    // second in-line version
+    getKind.toString + getEvaluation.map(s => if (cumLaude) "(30L)" else s"(${s})").getOrElse("")
   }
 }
 
@@ -96,24 +100,38 @@ case class ExamsManagerImpl() extends ExamManager {
   override def getAllStudentsFromCall(call: String): Set[String] = map(call).keySet
 
   override def getEvaluationsMapFromCall(call: String): Map[String, Int] = {
-    var m = Map[String, Int]()
-    map(call).foreach(k => if (k._2.getEvaluation.isDefined) m += (k._1 -> k._2.getEvaluation.get))
-    m
+    // first iterative version
+//    var m = Map[String, Int]()
+//    map(call).foreach(k => if (k._2.getEvaluation.isDefined) m += (k._1 -> k._2.getEvaluation.get))
+//    m
+
+    // second in-line version
+    map(call).filter(_._2.getEvaluation.isDefined).map(v => v._1 -> v._2.getEvaluation.get)
   }
 
   override def getResultsMapFromStudent(student: String): Map[String, String] = {
-    var m: Map[String, String] = Map()
-    map.foreach(k => k._2.foreach(x => if (x._1 == student) m+=(k._1 -> x._2.toString)))
-    m
+    // first iterative version
+//    var m: Map[String, String] = Map()
+//    map.foreach(k => k._2.foreach(x => if (x._1 == student) m+=(k._1 -> x._2.toString)))
+//    m
+
+    // second in-line version
+    map.filter(_._2.contains(student)).map(v => v._1 -> v._2(student).toString)
   }
 
   override def getBestResultFromStudent(student: String): Option[Int] = {
-    var res = 0
-    map.foreach(k => k._2.foreach(x => {
-      if (x._1 == student)
-        if (x._2.getEvaluation.isDefined)
-          if (x._2.getEvaluation.get > res) res = x._2.getEvaluation.get
-    }))
-    if (res==0) Option.empty else Option(res)
+    // first iterative version
+//    var res = 0
+//    map.foreach(k => k._2.foreach(x => {
+//      if (x._1 == student)
+//        if (x._2.getEvaluation.isDefined)
+//          if (x._2.getEvaluation.get > res) res = x._2.getEvaluation.get
+//    }))
+//    if (res==0) Option.empty else Option(res)
+
+    // second version
+    map.filter(v => v._2.contains(student) && v._2(student).getEvaluation.isDefined)
+      .map(_._2(student).getEvaluation.get)
+      .foldLeft(Option.empty[Int])((o,v) => if (o.isEmpty || v>o.get) Option(v) else o)
   }
 }
