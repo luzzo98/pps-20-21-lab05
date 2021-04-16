@@ -44,7 +44,7 @@ class TestExercise1 {
     assertThrows(classOf[UnsupportedOperationException], () => List.nil[Int].reduceLeft(_+_)) // test with Nil
     assertEquals(1, List(1).reduceLeft(_+_)) // single element list
     assertEquals(10, l.reduceLeft(_+_)) // ((1+2) +3) +4
-    assertEquals(-8, l.reduceLeft(_-_)) // ((1-2) -3) -4
+    assertEquals(-8, l.reduceLeft(_-_)) // ((1-2) -3) -4 = (-1 - 3) -4 = -4 - 4 = -8
     assertEquals("abXcXdX", l2.reduceLeft(_+_+"X"))
   }
 
@@ -55,8 +55,8 @@ class TestExercise1 {
 
     assertThrows(classOf[UnsupportedOperationException], () => List.nil[Int].reduceRight(_+_)) // test with Nil
     assertEquals(1, List(1).reduceRight(_+_)) // single element list
-    assertEquals(10, l.reduceRight(_+_)) // ((4+3) +2) +1
-    assertEquals(-2, l.reduceRight(_-_)) // ((4-3) -2) -1
+    assertEquals(10, l.reduceRight(_+_)) // 1+ (2+ (3+4))
+    assertEquals(-2, l.reduceRight(_-_)) // 1- (2- (3-4)) = 1- (2-(-1)) = 1-3 = -2
     assertEquals("abcdXXX", l2.reduceRight(_+_+"X"))
   }
 
