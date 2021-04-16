@@ -153,7 +153,7 @@ trait ListImplementation[A] extends List[A] {
   override def span(pred: A => Boolean): (List[A],List[A]) = {
     @tailrec
     def _span(l: List[A], l1: List[A] = Nil()): (List[A],List[A]) = l match {
-      case h :: t if (pred(h)) => _span(t, h :: l1)
+      case h :: t if pred(h) => _span(t, h :: l1)
       case _ => (l1.reverse(), l)
     }
     _span(this)
@@ -163,28 +163,37 @@ trait ListImplementation[A] extends List[A] {
     * @throws UnsupportedOperationException if the list is empty
     */
   override def reduceRight(op: (A,A)=>A): A = {
-    // first version with recursion; need match in the method
-//    case h :: Nil() => h
-//    case h :: t => op(h, t.reduceRight(op))
-//    case _ => throw new UnsupportedOperationException
-
     // linked to the second version of reduceLeft
     this.reverse().reduceLeft((a,b) => op(b,a))
+
+    // first version with recursion; need match in the method
+    //    case h :: Nil() => h
+    //    case h :: t => op(h, t.reduceRight(op))
+    //    case _ => throw new UnsupportedOperationException
   }
 
   /**
     * @throws UnsupportedOperationException if the list is empty
     */
   override def reduceLeft(op: (A,A)=>A): A = this match {
-    // linked to the first version of reduceRight; delete match from the method
-//    this.reverse().reduceRight((a1,a2) => op(a2,a1))
-
     // second version with foldRight
     case h :: t => t.foldLeft(h)(op)
     case _ => throw new UnsupportedOperationException
+
+    // linked to the first version of reduceRight; delete match from the method
+//    this.reverse().reduceRight((a1,a2) => op(a2,a1))
   }
 
   override def takeRight(n: Int): List[A] = {
+    //third version with foldRight
+    var i: Int = 0
+    foldRight(List[A]())((v,l) => { i+=1; if (i <= n) v :: l else l})
+
+     // second version with foreach
+//    var i: Int = 0; var list = List[A]()
+//    reverse().foreach(v => { i+=1; if (i <= n) list = v :: list } )
+//    list
+
     // first version with tailrec
 //    @tailrec
 //    def _takeRight(l: List[A], n: Int, l2: List[A] = Nil()): List[A] = l match {
@@ -193,15 +202,6 @@ trait ListImplementation[A] extends List[A] {
 //      case _ => Nil()
 //    }
 //    _takeRight(this.reverse(), n)
-
-    // second version with foreach
-//    var i: Int = 0; var list = List[A]()
-//    reverse().foreach(v => { i+=1; if (i <= n) list = v :: list } )
-//    list
-
-    //third version withfoldRight
-    var i: Int = 0
-    foldRight(List[A]())((v,l) => { i+=1; if (i <= n) v :: l else l})
   }
 
   override def collect[B](f: PartialFunction[A,B]): List[B] = filter(f.isDefinedAt).map(f)
