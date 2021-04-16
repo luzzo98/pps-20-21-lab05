@@ -30,7 +30,7 @@ trait ExamResult {
 //    getKind.toString + s
 
     // second in-line version
-    getKind.toString + getEvaluation.map(s => if (cumLaude) "(30L)" else s"(${s})").getOrElse("")
+    getKind.toString + getEvaluation.map(s => if (cumLaude) "(30L)" else s"($s)").getOrElse("")
   }
 }
 

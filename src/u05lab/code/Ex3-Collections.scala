@@ -1,8 +1,8 @@
 package u05lab.code
 
 import java.util.concurrent.TimeUnit
-import scala.collection.{LinearSeq, mutable}
-import scala.collection.immutable.{HashMap, HashSet, ListSet}
+import scala.collection.LinearSeq
+import scala.collection.immutable.{HashSet, ListSet}
 import scala.concurrent.duration.FiniteDuration
 
 object PerformanceUtils {
