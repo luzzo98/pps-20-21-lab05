@@ -2,6 +2,7 @@ package u05lab.code
 
 object Exercise4 {
 
+  // third version with map2
   def sequence[A](a: List[Option[A]]): Option[List[A]] =
     a.foldRight(Option(List[A]())) ((v,l) => map2(v)(l)((a,b) => a::b))
 
