@@ -120,10 +120,14 @@ case class ExamsManagerImpl() extends ExamManager {
   }
 
   override def getBestResultFromStudent(student: String): Option[Int] = {
+    // third version
+    val v = map.flatMap(v => if (v._2.contains(student)) v._2(student).getEvaluation else Option(0)).max
+    if (v == 0) Option.empty else Option(v) // with scala 2.13 you could use maxOption and delete this line
+
     // second version
-    map.filter(v => v._2.contains(student) && v._2(student).getEvaluation.isDefined)
-      .map(_._2(student).getEvaluation.get)
-      .foldLeft(Option.empty[Int])((o,v) => if (o.isEmpty || v>o.get) Option(v) else o)
+//    map.filter(v => v._2.contains(student) && v._2(student).getEvaluation.isDefined)
+//      .map(_._2(student).getEvaluation.get)
+//      .foldLeft(Option.empty[Int])((o,v) => if (o.isEmpty || v>o.get) Option(v) else o)
 
     // first iterative version
 //    var res = 0

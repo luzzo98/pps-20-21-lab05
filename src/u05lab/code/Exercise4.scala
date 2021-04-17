@@ -2,13 +2,13 @@ package u05lab.code
 
 object Exercise4 {
 
-  // third version with map2
   def sequence[A](a: List[Option[A]]): Option[List[A]] =
-    a.foldRight(Option(List[A]())) ((v,l) => if (v.isDefined && l.isDefined) map2(v)(l)((a,b) => Some(a::b)) else None)
+    a.foldRight(Option(List[A]())) ((v,l) => map2(v)(l)((a,b) => a::b))
 
   // map2 of the lab02
-  def map2[A,B,C](opt1: Option[A])(opt2: Option[B])(f: (A, B) => C): C = (opt1, opt2) match {
-    case (Some(a), Some(b)) => f(a,b)
+  def map2[A,B,C](opt1: Option[A])(opt2: Option[B])(f: (A, B) => C): Option[C] = (opt1, opt2) match {
+    case (Some(a), Some(b)) => Some(f(a,b))
+    case _ => None
   }
 
 
